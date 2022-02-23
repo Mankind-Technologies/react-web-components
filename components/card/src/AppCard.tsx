@@ -1,25 +1,39 @@
 import ReactDOM from 'react-dom';
 import React from 'react';
-import {Card} from "./Card";
+import {Card, CardProps} from "./Card";
 
 export class AppCard extends HTMLElement {
     constructor() {
         super();
     }
     private mountPoint;
-    static get observedAttributes() {
-        return ['name'];
+    private triggerChange: (props:CardProps) => void;
+
+    private LocalWrapper = ({url, name}) => {
+        const [props, setProps] = React.useState({url, name});
+        this.triggerChange = setProps;
+        console.log("Render! ", props);
+        return <Card {...props}/>;
     }
+
+    static get observedAttributes() {
+        return ['name', 'url'];
+    }
+
     attributeChangedCallback(name, oldValue, newValue) {
-        if (name === 'name') {
-            this.unmount();
-            this.mount();
+        if (this.triggerChange) {
+            const name = this.getAttribute('name');
+            const url = this.getAttribute('url');
+            this.triggerChange({
+                name,
+                url
+            });
         }
     }
     mount() {
         const name = this.getAttribute('name');
-        const url = 'https://www.google.com/search?q=' + encodeURIComponent(name);
-        ReactDOM.render(<Card url={url} name={name}/> , this.mountPoint);
+        const url = this.getAttribute('url');
+        ReactDOM.render(<this.LocalWrapper url={url} name={name}/> , this.mountPoint);
     }
     unmount() {
         ReactDOM.unmountComponentAtNode(this);
@@ -29,8 +43,10 @@ export class AppCard extends HTMLElement {
     }
     connectedCallback() {
         this.mountPoint = document.createElement('span');
-        this.attachShadow({ mode: 'open' }).appendChild(this.mountPoint);
+        const shadowRoot = this.attachShadow({ mode: 'open' })
+        shadowRoot.appendChild(this.mountPoint);
         this.mount();
     }
+
 }
 

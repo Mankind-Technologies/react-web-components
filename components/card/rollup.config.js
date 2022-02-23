@@ -5,12 +5,13 @@ import typescript from "rollup-plugin-typescript2";
 import postcss from "rollup-plugin-postcss";
 import babel from 'rollup-plugin-babel';
 
+const packageJson = require('./package.json');
 
 export default {
   input: "src/index.ts",
   output: [
     {
-      file: "../../components-server/card/index.js",
+      file: `../../components-server/components/card/${packageJson.version}/index.js`,
       format: "iife",
       sourcemap: true,
       globals: {

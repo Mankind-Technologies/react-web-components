@@ -1,10 +1,10 @@
 import React from 'react';
 
-interface Props {
+export interface CardProps {
     url: string;
     name: string;
 }
 
-export function Card(props:Props) {
+export function Card(props:CardProps) {
     return <a href={props.url}>{props.name}</a>;
 }
